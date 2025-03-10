@@ -1,0 +1,737 @@
+openapi: 3.1.0
+info:
+  title: Datince - REST API
+  description: |-
+    REST API for Datince.
+  contact:
+    email: avbaryshev@yandex.ru
+  version: 2.0.6
+servers:
+  - url: https://datinplace.ru/api/v2/
+tags:
+  - name: user
+    description: User management operations
+  - name: locations
+    description: Bars, restaurants, etc.
+  - name: filters
+    description: Age, height, children, etc.
+  - name: goals
+    description: Relationship goals
+  - name: chat
+    description: Messeger operations
+  - name: auth
+    description: Authentication operations
+  - name: resources
+    description: Data for user interfaces
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Register new user
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /auth/forgot-password:
+    post:
+      tags: [auth]
+      summary: Initiate password reset
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Reset instructions sent
+
+  /auth/reset-password:
+    post:
+      tags: [auth]
+      summary: Complete password reset
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Password updated
+
+  /auth/verify-email:
+    post:
+      tags: [auth]
+      summary: Verify email address
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Email verified
+  /user/support:
+    post:
+      tags: [user]
+      summary: Submit support request
+      security: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                theme:
+                  type: string
+                text:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Support request submitted
+
+  /user/{userId}:
+    get:
+      tags: [user]
+      summary: Get user profile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /user:
+    get:
+      tags: [user]
+      summary: Get user profile
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    
+    put:
+      tags: [user]
+      summary: Update user profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated
+
+    delete:
+      tags: [user]
+      summary: Delete user
+
+      responses:
+        '204':
+          description: User deleted
+
+  /user/email:
+    patch:
+      tags: [user]
+      summary: Update user email
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required: [email]
+      responses:
+        '200':
+          description: Email updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /user/password:
+    patch:
+      tags: [user]
+      summary: Update password
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  format: password
+                newPassword:
+                  type: string
+                  format: password
+              required: [currentPassword, newPassword]
+      responses:
+        '200':
+          description: Password updated
+
+  /user/photo:
+    patch:
+      tags: [user]
+      summary: Update main photo
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Main photo updated
+
+  /user/photos:
+    patch:
+      tags: [user]
+      summary: Update photos collection
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Photos collection updated
+
+  /locations/default:
+    get:
+      tags: [locations]
+      summary: Get default location
+
+      responses:
+        '200':
+          description: Default location data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponsePlace'
+
+  /locations/{locationId}:
+    get:
+      tags: [locations]
+      summary: Get specific location
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+
+    patch:
+      tags: [locations]
+      summary: Update location status
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                active:
+                  type: boolean
+      responses:
+        '200':
+          description: Location status updated
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponsePlace'
+
+    delete:
+      tags: [locations]
+      summary: Delete location
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Location deleted
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: User login
+      security: []
+      responses:
+        '200':
+          description: Successful login
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: User logout
+      responses:
+        '200':
+          description: Successful logout
+
+  /filters:
+    get:
+      tags: [filters]
+      summary: Get user filters
+
+      responses:
+        '200':
+          description: List of filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterList'
+    put:
+      tags: [filters]
+      summary: Update user filters
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilterList'
+      responses:
+        '200':
+          description: Filters updated
+
+  /filters-with-goals:
+    get:
+      tags: [filters, goals]
+      summary: Get user filters with goals
+
+      responses:
+        '200':
+          description: Filters and goals data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiltersWithGoals'
+    put:
+      tags: [filters, goals]
+      summary: Update user filters with goals
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiltersWithGoals'
+      responses:
+        '200':
+          description: Filters and goals updated
+
+  /goals:
+    get:
+      tags: [goals]
+      summary: Get user goals
+
+      responses:
+        '200':
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalList'
+
+    put:
+      tags: [goals]
+      summary: Update all goals
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalList'
+      responses:
+        '200':
+          description: Goals updated
+
+  /chat:
+    get:
+      tags: [chat]
+      summary: Chat list with users
+
+      responses:
+        '200':
+          description: List of dialog boxes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatList'
+
+  /chat/{chatId}:
+    get:
+      tags: [chat]
+      summary: Chat messages
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessages'
+
+  /user/photo/{photoId}:
+    delete:
+      tags: [user]
+      summary: Delete user photo
+      parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Photo deleted successfully
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resources/filters:
+    get:
+      tags: [resources]
+      summary: Filters data
+      responses:
+        '200':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Filters'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required: [email, password]
+      
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+        height:
+          type: number
+        children:
+          type: boolean
+        photo:
+          type: string
+          format: uri
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+        birthdate:
+          type: string
+          format: date
+        chatId:
+          type: string
+        hasChat:
+          type: boolean
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        text:
+          type: string
+        senderId:
+          type: string
+        receiverId:
+          type: string
+        timestamp:
+          type: string
+        status:
+          type: string
+      examples:
+        - id: 1
+          type: "text"
+          text: 'Hello World'
+          senderId: 'qwesad9s'
+          receiverId: 'awesad1f'
+          timestamp: "2025-03-07T12:00:00Z"
+          status: 'read | delivered | sent'
+
+    Location:
+      type: object
+      properties:
+        address:
+          type: string
+        name:
+          type: string
+        coord:
+          type: object
+          properties:
+            lat:
+              type: number
+              format: float
+            lon:
+              type: number
+              format: float
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    GoalList:
+      type: object
+      properties:
+        allGoals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+      examples:
+        - value:
+          - id: 1
+            name: "Goal 1"
+            selected: true
+          - id: 2
+            name: "Goal 2"
+
+    ChatList:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: object
+          $ref: '#/components/schemas/User'
+
+    ChatMessages:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+
+    Goal:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        selected:
+          type: boolean
+          default: false
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      examples:
+        - value:
+            code: 400
+            message: "Invalid credentials"
+
+    ErrorResponsePlace:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      examples:
+        - value:
+            code: 400
+            message: "Невозможно выбрать эту категорию заведений"
+
+    UserUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        birthdate:
+          type: string
+          format: date
+        name:
+          type: string
+        age:
+          type: integer
+        height:
+          type: number
+        children:
+          type: array
+          items:
+            type: string
+        photo:
+          type: string
+          format: uri
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    Filter:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        selected:
+          type: boolean
+          default: false
+
+    FilterList:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+      examples:
+        - filters:
+          - id: 1
+            name: "filter 1"
+            selected: true
+          - id: 2
+            name: "filter 2"
+    
+    FiltersWithGoals:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+
+    Filters:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+      examples:
+        - filter type:
+          - id: 1
+            name: "filter value 1"
+          - id: 2
+            name: "filter value 2"
