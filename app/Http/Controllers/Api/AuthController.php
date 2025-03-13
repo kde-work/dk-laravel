@@ -29,10 +29,17 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            $user = User::create([
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ошибка создания пользователя',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

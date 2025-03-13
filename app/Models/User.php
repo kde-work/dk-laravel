@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,12 +52,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'birthdate' => 'datetime:Y-m-d', // Пример кастинга даты
-        'photos' => 'array',            // Массив строк
-        'hasChat' => 'boolean',         // Булево значение
+        'birthdate' => 'date',
+        'photos' => 'array',
+        'hasChat' => 'boolean',
     ];
 
-    public static function create(array $array) {
+    /**
+     * @throws Exception
+     */
+    public static function create(array $attributes = []) {
+        try {
+            return static::query()->create($attributes);
+        } catch (\Illuminate\Database\QueryException $e) {
+            throw new Exception('Ошибка при создании пользователя: ' . $e->getMessage());
+        }
     }
 
     /**
