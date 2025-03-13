@@ -65,6 +65,7 @@ class User extends Authenticatable
         try {
             return static::query()->create($attributes);
         } catch (\Illuminate\Database\QueryException $e) {
+            var_export($e->getMessage());
             throw new Exception('Ошибка при создании пользователя: ' . $e->getMessage());
         }
     }

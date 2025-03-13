@@ -13,13 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Middleware для всех маршрутов
-        $middleware->use([
-            \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ]);
+//        $middleware->use([
+//            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+//            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+//        ]);
 
-        // Middleware только для API
         $middleware->api([
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);

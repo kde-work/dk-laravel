@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            Route::middleware('api')
+            Route::middleware('auth:sanctum')
                  ->prefix('api')
                  ->group(base_path('routes/api.php'));
 
@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    protected function configureRateLimiting()
+    protected function configureRateLimiting(): void
     {
         RateLimiter::for('global', function ($request) {
             return Limit::perMinute(100); // Ограничение 100 запросов в минуту для всех
