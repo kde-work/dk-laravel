@@ -6,12 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 use OpenAPI\Server\Model\User as OpenApiUser;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -54,6 +55,9 @@ class User extends Authenticatable
         'photos' => 'array',            // Массив строк
         'hasChat' => 'boolean',         // Булево значение
     ];
+
+    public static function create(array $array) {
+    }
 
     /**
      * Get the attributes that should be cast.
