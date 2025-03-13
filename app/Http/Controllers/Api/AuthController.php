@@ -54,23 +54,37 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     public function login(Request $request):JsonResponse {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        if (!Auth::attempt($validatedData)) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Ошибка валидации',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            if (!Auth::attempt($request->only('email', 'password'))) {
+                return response()->json([
+                    'message' => 'Неверные учетные данные',
+                ], 401);
+            }
+
+            $user = User::where('email', $request->email)->first();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
-                'message' => 'Неверные учетные данные',
-            ], 401);
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Произошла ошибка при входе',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $user = User::where('email', $validatedData['email'])->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
     }
 }

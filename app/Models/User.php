@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -66,6 +67,11 @@ class User extends Authenticatable
         } catch (\Illuminate\Database\QueryException $e) {
             throw new Exception('Ошибка при создании пользователя: ' . $e->getMessage());
         }
+    }
+
+    public static function where($column, $operator = null, $value = null, $boolean = 'and'): Builder
+    {
+        return static::query()->where($column, $operator, $value, $boolean);
     }
 
     /**
