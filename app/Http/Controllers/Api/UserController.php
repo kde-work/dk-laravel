@@ -51,10 +51,8 @@ class UserController extends Controller
         try {
             $user = $this->userService->updateEmail(Auth::user(), $data['email']);
             return response()->json($user->toOpenApiModel());
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить email'], 500);
-        } catch (\Throwable $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
