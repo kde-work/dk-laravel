@@ -5,10 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use OpenAPI\Server\Model\User as OpenApiUser;
-use Throwable;
 
 class User extends Authenticatable
 {
@@ -30,50 +28,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Обновление email пользователя
-     * @throws Throwable
-     */
-    public function updateEmail(string $email): void
-    {
-        $this->email = $email;
-        $this->saveOrFail();
-    }
-
-    /**
-     * Обновление пароля с проверкой текущего
-     * @throws Throwable
-     */
-    public function updatePassword(string $currentPassword, string $newPassword): void
-    {
-        if (!Hash::check($currentPassword, $this->password)) {
-            throw new \RuntimeException('Неверный текущий пароль');
-        }
-
-        $this->password = Hash::make($newPassword);
-        $this->saveOrFail();
-    }
-
-    /**
-     * Обновление основной фотографии
-     * @throws Throwable
-     */
-    public function updateProfilePhoto(string $photoPath): void
-    {
-        $this->photo = $photoPath;
-        $this->saveOrFail();
-    }
-
-    /**
-     * Обновление коллекции фотографий
-     * @throws Throwable
-     */
-    public function updatePhotos(array $photos): void
-    {
-        $this->photos = $photos;
-        $this->saveOrFail();
-    }
-
-    /**
      * Преобразование в OpenAPI-модель
      */
     public function toOpenApiModel(): OpenApiUser
@@ -89,14 +43,5 @@ class User extends Authenticatable
             chatId: $this->chatId,
             hasChat: $this->hasChat,
         );
-    }
-
-    /**
-     * Обновление профиля с валидацией
-     * @throws Throwable
-     */
-    public function updateProfile(array $attributes): void
-    {
-        $this->fill($attributes)->saveOrFail();
     }
 }
