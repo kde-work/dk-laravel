@@ -2,54 +2,25 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
-
 use OpenAPI\Server\Model\User as OpenApiUser;
+use Throwable;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'age',
-        'height',
-        'children',
-        'photo',
-        'photos',
-        'birthdate',
-        'chatId',
-        'hasChat',
+        'name', 'email', 'password', 'age', 'height', 'children',
+        'photo', 'photos', 'birthdate', 'chatId', 'hasChat',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
@@ -59,38 +30,51 @@ class User extends Authenticatable
     ];
 
     /**
-     * @throws Exception
+     * Обновление email пользователя
+     * @throws Throwable
      */
-    public static function create(array $attributes = [])
+    public function updateEmail(string $email): void
     {
-        try {
-            return static::query()->create($attributes);
-        } catch (\Illuminate\Database\QueryException $e) {
-            var_export($e->getMessage());
-            throw new Exception('Ошибка при создании пользователя: ' . $e->getMessage());
+        $this->email = $email;
+        $this->saveOrFail();
+    }
+
+    /**
+     * Обновление пароля с проверкой текущего
+     * @throws Throwable
+     */
+    public function updatePassword(string $currentPassword, string $newPassword): void
+    {
+        if (!Hash::check($currentPassword, $this->password)) {
+            throw new \RuntimeException('Неверный текущий пароль');
         }
-    }
 
-    public static function where($column, $operator = null, $value = null, $boolean = 'and'): Builder
-    {
-        return static::query()->where($column, $operator, $value, $boolean);
+        $this->password = Hash::make($newPassword);
+        $this->saveOrFail();
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Обновление основной фотографии
+     * @throws Throwable
      */
-    protected function casts(): array
+    public function updateProfilePhoto(string $photoPath): void
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $this->photo = $photoPath;
+        $this->saveOrFail();
     }
 
     /**
-     * Преобразовать текущую модель в OpenAPI-модель.
+     * Обновление коллекции фотографий
+     * @throws Throwable
+     */
+    public function updatePhotos(array $photos): void
+    {
+        $this->photos = $photos;
+        $this->saveOrFail();
+    }
+
+    /**
+     * Преобразование в OpenAPI-модель
      */
     public function toOpenApiModel(): OpenApiUser
     {
@@ -105,5 +89,14 @@ class User extends Authenticatable
             chatId: $this->chatId,
             hasChat: $this->hasChat,
         );
+    }
+
+    /**
+     * Обновление профиля с валидацией
+     * @throws Throwable
+     */
+    public function updateProfile(array $attributes): void
+    {
+        $this->fill($attributes)->saveOrFail();
     }
 }
