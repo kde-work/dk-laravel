@@ -39,7 +39,7 @@ class UserController extends Controller
             $updatedUser = $this->userService->updateProfile(Auth::user(), $userDTO);
 
             return response()->json($updatedUser->toOpenApiModel());
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить профиль'], 500);
         }
     }
@@ -53,6 +53,8 @@ class UserController extends Controller
             return response()->json($user->toOpenApiModel());
         } catch (\Exception $e) {
             return response()->json(['error' => 'Не удалось обновить email'], 500);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -68,7 +70,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Пароль обновлен']);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить пароль'], 500);
         }
     }
@@ -81,7 +83,7 @@ class UserController extends Controller
             $photoPath = 'path/to/saved/photo.jpg'; // Логика сохранения файла
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
             return response()->json(['message' => 'Фото обновлено', 'user' => $user->toOpenApiModel()]);
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить фото'], 500);
         }
     }
@@ -97,7 +99,7 @@ class UserController extends Controller
             $photosPaths = ['path1.jpg', 'path2.jpg']; // Логика сохранения файлов
             $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
             return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toOpenApiModel()]);
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить коллекцию фото'], 500);
         }
     }
@@ -107,7 +109,7 @@ class UserController extends Controller
         try {
             $this->userService->deleteUser(Auth::user());
             return response()->json(null, 204);
-        } catch (\Exception $e) {
+        } catch (\Exception|\Throwable $e) {
             return response()->json(['error' => 'Не удалось удалить пользователя'], 500);
         }
     }
