@@ -99,6 +99,7 @@ class UserTest extends TestCase
 
     public function testChildrenFieldIsBoolean(): void
     {
+        /** @var User $user */
         $user = User::factory()->create(['children' => false, 'birthdate' => '2000-01-01',]);
 
         $this->assertFalse((bool) $user->children);
