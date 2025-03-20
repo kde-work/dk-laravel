@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\DTO\UserDTO;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -39,7 +42,7 @@ class UserController extends Controller
             $updatedUser = $this->userService->updateProfile(Auth::user(), $userDTO);
 
             return response()->json($updatedUser->toOpenApiModel());
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить профиль. ' . $e->getMessage()], 500);
         }
     }
@@ -51,7 +54,7 @@ class UserController extends Controller
         try {
             $user = $this->userService->updateEmail(Auth::user(), $data['email']);
             return response()->json($user->toOpenApiModel());
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить email. ' . $e->getMessage()], 500);
         }
     }
@@ -66,9 +69,9 @@ class UserController extends Controller
         try {
             $this->userService->updatePassword(Auth::user(), $data['currentPassword'], $data['newPassword']);
             return response()->json(['message' => 'Пароль обновлен']);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить пароль. ' . $e->getMessage()], 500);
         }
     }
@@ -81,7 +84,7 @@ class UserController extends Controller
             $photoPath = 'path/to/saved/photo.jpg'; // Логика сохранения файла
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
             return response()->json(['message' => 'Фото обновлено', 'user' => $user->toOpenApiModel()]);
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить фото. ' . $e->getMessage()], 500);
         }
     }
@@ -97,7 +100,7 @@ class UserController extends Controller
             $photosPaths = ['path1.jpg', 'path2.jpg']; // Логика сохранения файлов
             $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
             return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toOpenApiModel()]);
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить коллекцию фото. ' . $e->getMessage()], 500);
         }
     }
@@ -107,7 +110,7 @@ class UserController extends Controller
         try {
             $this->userService->deleteUser(Auth::user());
             return response()->json(null, 204);
-        } catch (\Exception|\Throwable $e) {
+        } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось удалить пользователя. ' . $e->getMessage()], 500);
         }
     }
