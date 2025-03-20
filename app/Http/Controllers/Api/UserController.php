@@ -20,7 +20,9 @@ class UserController extends Controller
 
     public function show(): JsonResponse
     {
-        return response()->json(Auth::user()->toOpenApiModel());
+        /** @var UserDTO $userDTO */
+        $userDTO = Auth::user()->toDTO();
+        return response()->json($userDTO->toOpenApiModel());
     }
 
     public function update(Request $request): JsonResponse
