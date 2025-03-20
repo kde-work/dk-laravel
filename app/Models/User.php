@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\DTO\UserDTO;
+use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,7 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property bool $children
  * @property string $photo
  * @property array $photos
- * @property \DateTime $birthdate
+ * @property DateTime $birthdate
  * @property string|null $chatId
  * @property bool $hasChat
  */
