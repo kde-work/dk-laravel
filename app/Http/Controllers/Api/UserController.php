@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -14,7 +15,8 @@ class UserController extends Controller
      *
      * @return JsonResponse
      */
-    public function show():JsonResponse {
+    public function show(): JsonResponse
+    {
         /** @var User $user */
         $user = Auth::user();
 
@@ -31,7 +33,8 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function update(Request $request):JsonResponse {
+    public function update(Request $request): JsonResponse
+    {
         /** @var User $user */
         $user = Auth::user();
 
@@ -61,7 +64,8 @@ class UserController extends Controller
      *
      * @return JsonResponse
      */
-    public function destroy():JsonResponse {
+    public function destroy(): JsonResponse
+    {
         /** @var User $user */
         $user = Auth::user();
 

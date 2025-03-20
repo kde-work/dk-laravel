@@ -61,7 +61,8 @@ class User extends Authenticatable
     /**
      * @throws Exception
      */
-    public static function create(array $attributes = []) {
+    public static function create(array $attributes = [])
+    {
         try {
             return static::query()->create($attributes);
         } catch (\Illuminate\Database\QueryException $e) {
