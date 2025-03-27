@@ -16,7 +16,7 @@ class UserDTO
         public ?bool    $children = null,
         public ?string  $photo = null,
         public ?array   $photos = null,
-        public DateTime $birthdate = new DateTime,
+        public ?DateTime $birthdate = new DateTime,
         public ?string  $chatId = null,
         public ?bool    $hasChat = null
     )

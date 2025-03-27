@@ -34,31 +34,31 @@ class User
 {
     /**
     *
-    * 
+    *
     * @param string $name
     *
-    * 
+    *
     * @param int $age
     *
-    * 
+    *
     * @param float $height
     *
-    * 
+    *
     * @param bool $children
     *
-    * 
+    *
     * @param string $photo
     *
-    * 
+    *
     * @param string[] $photos
     *
-    * 
+    *
     * @param \DateTime $birthdate
     *
-    * 
+    *
     * @param string $chatId
     *
-    * 
+    *
     * @param bool $hasChat
     */
 

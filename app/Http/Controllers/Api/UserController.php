@@ -87,7 +87,7 @@ class UserController extends Controller
         $request->validate(['photo' => 'required|image']);
 
         try {
-            $photoPath = $this->photoService->upload($request['photo']);
+            $photoPath = $this->photoService->upload($request->file('photo'));
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
             return response()->json(['message' => 'Фото обновлено', 'user' => $user->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
@@ -103,7 +103,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $photosPaths = $this->photoService->upload($request['photos']);;
+            $photosPaths = $this->photoService->upload($request->file('photos'));
             $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
             return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
