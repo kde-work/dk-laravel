@@ -11,6 +11,7 @@ class UserDTO
     public function __construct(
         public ?int     $id = 0,
         public ?string  $name = null,
+        public ?string  $email = null,
         public ?int     $age = null,
         public ?float   $height = null,
         public ?bool    $children = null,
@@ -28,6 +29,7 @@ class UserDTO
         return new self(
             id: $user->id,
             name: $user->name,
+            email: $user->email,
             age: $user->age,
             height: $user->height,
             children: $user->children,
@@ -43,6 +45,7 @@ class UserDTO
     {
         return new OpenApiUser(
             name: $this->name,
+            email: $this->email,
             age: $this->age,
             height: $this->height,
             children: $this->children,
@@ -59,6 +62,7 @@ class UserDTO
         return new self(
             id: $data['id'] ?? null,
             name: $data['name'] ?? null,
+            email: $data['email'] ?? null,
             age: $data['age'] ?? null,
             height: $data['height'] ?? null,
             children: $data['children'] ?? null,
@@ -75,6 +79,7 @@ class UserDTO
         return array_filter([
             'id' => $this->id,
             'name' => $this->name,
+            'email' => $this->email,
             'age' => $this->age,
             'height' => $this->height,
             'children' => $this->children,

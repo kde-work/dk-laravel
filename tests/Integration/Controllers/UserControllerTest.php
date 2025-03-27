@@ -16,7 +16,17 @@ class UserControllerTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create([
-            'password' => Hash::make('current_password'),
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'secret',
+            'age' => 25,
+            'height' => 180.5,
+            'children' => true,
+            'photo' => 'avatar.jpg',
+            'photos' => ['img1.jpg', 'img2.jpg'],
+            'birthdate' => '2000-01-01',
+            'chatId' => '12345',
+            'hasChat' => true,
         ]);
     }
 
@@ -26,11 +36,12 @@ class UserControllerTest extends TestCase
 
         $response = $this->getJson('/api/v2/user');
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'name' => $this->user->name,
-                'email' => $this->user->email,
-            ]);
+        $response->assertStatus(200);
+
+        $data = $response->json();
+
+        $this->assertEquals($this->user->name, $data['name']);
+        $this->assertEquals($this->user->email, $data['email']);
     }
 
     public function testUpdateUserProfile()

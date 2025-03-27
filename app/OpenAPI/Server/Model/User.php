@@ -34,36 +34,40 @@ class User
 {
     /**
     *
-    *
+    * 
     * @param string $name
     *
+    * 
+    * @param string $email
     *
+    * 
     * @param int $age
     *
-    *
+    * 
     * @param float $height
     *
-    *
+    * 
     * @param bool $children
     *
-    *
+    * 
     * @param string $photo
     *
-    *
+    * 
     * @param string[] $photos
     *
-    *
+    * 
     * @param \DateTime $birthdate
     *
-    *
+    * 
     * @param string $chatId
     *
-    *
+    * 
     * @param bool $hasChat
     */
 
     public function __construct(
         public string $name,
+        public string $email,
         public int $age,
         public float $height,
         public bool $children,

@@ -151,7 +151,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-    
+
     put:
       tags: [user]
       summary: Update user profile
@@ -510,11 +510,13 @@ components:
           type: string
           format: password
       required: [email, password]
-      
+
     User:
       type: object
       properties:
         name:
+          type: string
+        email:
           type: string
         age:
           type: integer
@@ -709,7 +711,7 @@ components:
             selected: true
           - id: 2
             name: "filter 2"
-    
+
     FiltersWithGoals:
       type: object
       properties:
