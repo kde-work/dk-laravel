@@ -9,7 +9,7 @@ use OpenAPI\Server\Model\User as OpenApiUser;
 class UserDTO
 {
     public function __construct(
-        public ?int     $id,
+        public ?int     $id = 0,
         public ?string  $name = null,
         public ?int     $age = null,
         public ?float   $height = null,
