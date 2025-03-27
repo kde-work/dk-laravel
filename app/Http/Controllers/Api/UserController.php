@@ -47,7 +47,7 @@ class UserController extends Controller
             $userDTO = UserDTO::fromArray($validated);
             $updatedUser = $this->userService->updateProfile(Auth::user(), $userDTO);
 
-            return response()->json($updatedUser->toOpenApiModel());
+            return response()->json($updatedUser->toDTO()->toOpenApiModel());
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить профиль. ' . $e->getMessage()], 500);
         }
@@ -59,7 +59,7 @@ class UserController extends Controller
 
         try {
             $user = $this->userService->updateEmail(Auth::user(), $data['email']);
-            return response()->json($user->toOpenApiModel());
+            return response()->json($user->toDTO()->toOpenApiModel());
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить email. ' . $e->getMessage()], 500);
         }
@@ -89,7 +89,7 @@ class UserController extends Controller
         try {
             $photoPath = $this->photoService->upload($request->file('photo'));
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
-            return response()->json(['message' => 'Фото обновлено', 'user' => $user->toOpenApiModel()]);
+            return response()->json(['message' => 'Фото обновлено', 'user' => $user->toDTO()->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить фото. ' . $e->getMessage()], 500);
         }
@@ -105,7 +105,7 @@ class UserController extends Controller
         try {
             $photosPaths = $this->photoService->upload($request->file('photos'));
             $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
-            return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toOpenApiModel()]);
+            return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toDTO()->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить коллекцию фото. ' . $e->getMessage()], 500);
         }

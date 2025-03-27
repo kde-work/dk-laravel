@@ -57,8 +57,11 @@ class UserControllerTest extends TestCase
 
         $response = $this->putJson('/api/v2/user', $data);
 
-        $response->assertStatus(200)
-            ->assertJson(['name' => 'Updated Name']);
+        $response->assertStatus(200);
+
+        $data = $response->json();
+
+        $this->assertEquals('Updated Name', $data['name']);
 
         $this->assertDatabaseHas('users', ['name' => 'Updated Name']);
     }
@@ -91,7 +94,6 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['message' => 'Пароль обновлен']);
 
-        // Проверяем, что пароль обновился
         $this->assertTrue(Hash::check('new_password123', $this->user->fresh()->password));
     }
 
