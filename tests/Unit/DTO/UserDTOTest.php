@@ -103,6 +103,7 @@ class UserDTOTest extends TestCase
         $dto = new UserDTO(
             id: 4,
             name: 'Eve Wilson',
+            email: 'eve@example.com',
             age: 28,
             height: 168.5,
             children: true,
@@ -116,14 +117,15 @@ class UserDTOTest extends TestCase
         $openApiUser = $dto->toOpenApiModel();
 
         $this->assertInstanceOf(OpenApiUser::class, $openApiUser);
-        $this->assertEquals('Eve Wilson', $openApiUser->getName());
-        $this->assertEquals(28, $openApiUser->getAge());
-        $this->assertEquals(168.5, $openApiUser->getHeight());
-        $this->assertTrue($openApiUser->getChildren());
-        $this->assertEquals('eve.jpg', $openApiUser->getPhoto());
-        $this->assertEquals(['eve1.jpg', 'eve2.jpg'], $openApiUser->getPhotos());
-        $this->assertEquals(new DateTime('1993-03-20'), $openApiUser->getBirthdate());
-        $this->assertEquals('chat202', $openApiUser->getChatId());
-        $this->assertFalse($openApiUser->getHasChat());
+        $this->assertEquals('Eve Wilson', $openApiUser->name);
+        $this->assertEquals('eve@example.com', $openApiUser->email);
+        $this->assertEquals(28, $openApiUser->age);
+        $this->assertEquals(168.5, $openApiUser->height);
+        $this->assertTrue($openApiUser->children);
+        $this->assertEquals('eve.jpg', $openApiUser->photo);
+        $this->assertEquals(['eve1.jpg', 'eve2.jpg'], $openApiUser->photos);
+        $this->assertEquals(new DateTime('1993-03-20'), $openApiUser->birthdate);
+        $this->assertEquals('chat202', $openApiUser->chatId);
+        $this->assertFalse($openApiUser->hasChat);
     }
 }
