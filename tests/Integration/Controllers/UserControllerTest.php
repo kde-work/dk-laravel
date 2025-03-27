@@ -85,7 +85,7 @@ class UserControllerTest extends TestCase
         Sanctum::actingAs($this->user);
 
         $data = [
-            'currentPassword' => 'current_password',
+            'currentPassword' => 'secret',
             'newPassword' => 'new_password123',
         ];
 
