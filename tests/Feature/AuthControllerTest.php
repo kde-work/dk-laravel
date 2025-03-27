@@ -12,8 +12,6 @@ class AuthControllerTest extends TestCase
 
     /**
      * Тест успешной регистрации пользователя.
-     *
-     * @return void
      */
     public function testUserCanRegister(): void
     {
@@ -23,20 +21,16 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'access_token',
-                     'token_type',
-                 ]);
+            ->assertJsonStructure([
+                'access_token',
+                'token_type',
+            ]);
 
-        $this->assertDatabaseHas('users', [
-            'email' => 'test2@example.com',
-        ]);
+        $this->assertDatabaseHas('users', ['email' => 'test2@example.com']);
     }
 
     /**
      * Тест невозможности регистрации с некорректными данными.
-     *
-     * @return void
      */
     public function testUserCannotRegisterWithInvalidData(): void
     {
@@ -46,13 +40,11 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['email', 'password']);
+            ->assertJsonValidationErrors(['email', 'password']);
     }
 
     /**
      * Тест успешного входа пользователя.
-     *
-     * @return void
      */
     public function testUserCanLogin(): void
     {
@@ -67,16 +59,14 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'access_token',
-                     'token_type',
-                 ]);
+            ->assertJsonStructure([
+                'access_token',
+                'token_type',
+            ]);
     }
 
     /**
      * Тест невозможности входа с неверными учетными данными.
-     *
-     * @return void
      */
     public function testUserCannotLoginWithInvalidCredentials(): void
     {
@@ -86,8 +76,6 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(401)
-                 ->assertJson([
-                     'message' => 'Неверные учетные данные',
-                 ]);
+            ->assertJson(['message' => 'Неверные учетные данные']);
     }
 }
