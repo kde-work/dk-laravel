@@ -3,16 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\AuthService;
+use App\DTO\UserRegistrationDTO;
+use App\DTO\UserLoginDTO;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly AuthService $authService,
+    ) {
+    }
+
     /**
+     * Регистрация пользователя.
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -26,66 +34,65 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Ошибка валидации',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
-            $user = User::create([
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+            $dto = new UserRegistrationDTO(
+                email: $request->email,
+                password: $request->password
+            );
+
+            $response = $this->authService->register($dto);
+
+            return response()->json($response, 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Ошибка создания пользователя',
-                'errors' => $validator->errors()
-            ], 422);
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
     }
 
     /**
+     * Авторизация пользователя.
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function login(Request $request): JsonResponse
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Ошибка валидации',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            if (!Auth::attempt($request->only('email', 'password'))) {
-                return response()->json([
-                    'message' => 'Неверные учетные данные',
-                ], 401);
-            }
-
-            $user = User::where('email', $request->email)->first();
-            $token = $user->createToken('auth_token')->plainTextToken;
-
+        if ($validator->fails()) {
             return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]);
+                'message' => 'Ошибка валидации',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $dto = new UserLoginDTO(
+                email: $request->email,
+                password: $request->password
+            );
+
+            $response = $this->authService->login($dto);
+
+            return response()->json($response);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Неверные учетные данные',
+                'errors' => $e->errors(),
+            ], 401);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Произошла ошибка при входе',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

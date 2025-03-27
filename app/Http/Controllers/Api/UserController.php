@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
+use App\Services\PhotoService;
 use App\DTO\UserDTO;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,7 +15,10 @@ use Throwable;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly UserService $userService)
+    public function __construct(
+        private readonly UserService  $userService,
+        private readonly PhotoService $photoService
+    )
     {
     }
 
@@ -83,7 +87,7 @@ class UserController extends Controller
         $request->validate(['photo' => 'required|image']);
 
         try {
-            $photoPath = 'path/to/saved/photo.jpg'; // Логика сохранения файла
+            $photoPath = $this->photoService->upload($request['photo']);
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
             return response()->json(['message' => 'Фото обновлено', 'user' => $user->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
@@ -99,7 +103,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $photosPaths = ['path1.jpg', 'path2.jpg']; // Логика сохранения файлов
+            $photosPaths = $this->photoService->upload($request['photos']);;
             $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
             return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
