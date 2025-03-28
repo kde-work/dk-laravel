@@ -2,37 +2,63 @@
 
 namespace App\Services;
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 use App\Domain\Image\ValueObjects\ImageFormat;
-use Intervention\Image\Image;
 
 class ImageProcessorService
 {
     public function __construct(
-        private int $defaultQuality = 80
+        private ImageManager $imageManager,
+        private int          $defaultQuality = 80
     )
     {
     }
 
     public function processImage(
-        Image $image,
-        array $formats,
-        ?int  $quality = null
-    ): void
+        string $imagePath,
+        array  $formats,
+        ?int   $quality = null
+    ): array
     {
         $quality = $quality ?? $this->defaultQuality;
+        $results = [];
 
-        foreach ($formats as $format) {
-            $imageFormat = new ImageFormat($format);
-            $this->convertToFormat($image, $imageFormat, $quality);
+        try {
+            $image = $this->imageManager->read($imagePath);
+
+            foreach ($formats as $format) {
+                $imageFormat = new ImageFormat($format);
+                $newPath = $this->convertToFormat($image, $imageFormat, $quality);
+                $results[$format] = $newPath;
+            }
+
+            return $results;
+        } finally {
+            if (isset($image)) {
+                $image->core()->native()->destroy();
+            }
         }
     }
 
     private function convertToFormat(
-        Image       $image,
-        ImageFormat $format,
-        int         $quality
-    ): void
+        ImageInterface $image,
+        ImageFormat    $format,
+        int            $quality
+    ): string
     {
-        $image->encode($format->value())->save(null, $quality);
+        $newPath = $this->generateNewPath($image->origin()->filepath(), $format->value());
+
+        $image->encodeByExtension($format->value(), [
+            'quality' => $quality
+        ])->save($newPath);
+
+        return $newPath;
+    }
+
+    private function generateNewPath(string $originalPath, string $format): string
+    {
+        $info = pathinfo($originalPath);
+        return $info['dirname'] . '/' . $info['filename'] . '.' . $format;
     }
 }
