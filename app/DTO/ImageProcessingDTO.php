@@ -4,11 +4,11 @@ namespace App\DTO;
 
 use App\Models\ImageUpload;
 
-class ImageProcessingDTO
+readonly class ImageProcessingDTO
 {
     public function __construct(
-        public readonly ImageUpload $imageUpload,
-        public readonly array $formats = ['webp', 'avif'],
-        public readonly int $quality = 80
+        public ImageUpload $imageUpload,
+        public array       $formats = ['webp', 'avif'],
+        public int         $quality = 80
     ) {}
 }
