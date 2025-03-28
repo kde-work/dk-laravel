@@ -133,6 +133,63 @@ class UserControllerTest extends TestCase
         $this->assertNotEquals($oldPhoto, $this->user->fresh()->photo);
     }
 
+    public function testUpdatePhotos()
+    {
+        $oldPhotos = $this->user->photos ?? [];
+
+        Sanctum::actingAs($this->user);
+        Storage::fake('public');
+
+        $files = [
+            UploadedFile::fake()->image('photo1.jpg'),
+            UploadedFile::fake()->image('photo2.jpg'),
+            UploadedFile::fake()->image('photo3.jpg'),
+        ];
+
+        $response = $this->patchJson('/api/v2/user/photos', [
+            'photos' => $files
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Коллекция фото обновлена'
+            ]);
+
+        $updatedUser = $this->user->fresh();
+
+        $this->assertNotEquals($oldPhotos, $updatedUser->photos);
+
+        $this->assertCount(3, $updatedUser->photos);
+
+        foreach ($updatedUser->photos as $photoPath) {
+            Storage::disk('public')->assertExists(str_replace('/storage/', '', $photoPath));
+        }
+
+        $response->assertJsonStructure([
+            'message',
+            'user' => [
+                'photos'
+            ]
+        ]);
+    }
+
+    public function testFileStorageIntegration()
+    {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->image('test.jpg');
+        $filename = 'custom_name.jpg';
+
+        Storage::disk('public')
+            ->putFileAs('photos', $file, $filename);
+
+        Storage::disk('public')->assertExists("photos/{$filename}");
+
+        $this->assertFileDoesNotExist(
+            storage_path("app/public/photos/{$filename}")
+        );
+    }
+
     public function testDeleteUser()
     {
         Sanctum::actingAs($this->user);
@@ -141,7 +198,6 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(204);
 
-        // Убедимся, что пользователь удален из базы данных
         $this->assertDatabaseMissing('users', ['id' => $this->user->id]);
     }
 }
