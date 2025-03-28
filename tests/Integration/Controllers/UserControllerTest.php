@@ -4,9 +4,11 @@ namespace Tests\Integration\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Storage;
 
 class UserControllerTest extends TestCase
 {
@@ -112,20 +114,23 @@ class UserControllerTest extends TestCase
             ->assertJson(['error' => 'Неверный текущий пароль']);
     }
 
-    public function tesstUpdateProfilePhoto()
+    public function testUpdateProfilePhoto()
     {
+        $oldPhoto = $this->user->photo;
+
         Sanctum::actingAs($this->user);
 
-        \Storage::fake('public');
+        Storage::fake('public');
 
-        $file = \Illuminate\Http\UploadedFile::fake()->image('photo.jpg');
+        $file = UploadedFile::fake()->image('photo.jpg');
 
         $response = $this->patchJson('/api/v2/user/photo', ['photo' => $file]);
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'Фото обновлено']);
 
-        \Storage::disk('public')->assertExists($file->hashName());
+        $this->assertNotNull($this->user->fresh()->photo);
+        $this->assertNotEquals($oldPhoto, $this->user->fresh()->photo);
     }
 
     public function testDeleteUser()
