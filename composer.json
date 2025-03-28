@@ -10,6 +10,7 @@
         "crell/serde": "^1.3",
         "darkaonline/l5-swagger": "^9.0",
         "doctrine/dbal": "^4.2",
+        "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
