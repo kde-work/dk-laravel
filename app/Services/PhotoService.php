@@ -30,8 +30,12 @@ class PhotoService
      */
     private function uploadSingle(UploadedFile $file): string
     {
-        $filename = $this->generateFilename($file);
-        $path = $file->storeAs('photos', $filename, 'public');
+        $path = Storage::disk('public')->putFileAs(
+            'photos',
+            $file,
+            $this->generateFilename($file)
+        );
+
         return Storage::url($path);
     }
 
