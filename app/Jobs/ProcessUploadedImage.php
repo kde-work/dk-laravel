@@ -9,7 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\Storage;
 
 class ProcessUploadedImage implements ShouldQueue
@@ -25,28 +26,27 @@ class ProcessUploadedImage implements ShouldQueue
     public function handle(ImageProcessorService $processor): void
     {
         try {
-            $image = Image::make(
-                Storage::path($this->dto->imageUpload->path)
-            );
+            $imageManager = new ImageManager(new Driver());
+            $imagePath = Storage::path($this->dto->imageUpload->path);
 
-            $processor->processImage(
-                $image,
+            $processedPaths = $processor->processImage(
+                $imagePath,
                 $this->dto->formats,
                 $this->dto->quality
             );
 
-            $this->updateImageUploadModel();
-            $image->destroy();
+            $this->updateImageUploadModel($processedPaths);
         } catch (\Exception $e) {
             $this->fail($e);
         }
     }
 
-    private function updateImageUploadModel(): void
+    private function updateImageUploadModel(array $processedPaths): void
     {
         $this->dto->imageUpload->update([
             'processed' => true,
-            'formats' => $this->dto->formats
+            'formats' => array_keys($processedPaths),
+            'processed_paths' => $processedPaths
         ]);
     }
 }
