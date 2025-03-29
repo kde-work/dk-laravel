@@ -129,8 +129,8 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['message' => 'Фото обновлено']);
 
-        $this->assertNotNull($this->user->fresh()->photo);
-        $this->assertNotEquals($oldPhoto, $this->user->fresh()->photo);
+        $this->assertNotNull($this->user->fresh()->toDTO()->photo);
+        $this->assertNotEquals($oldPhoto, $this->user->fresh()->toDTO()->photo);
     }
 
     public function testUpdatePhotos()
@@ -155,7 +155,7 @@ class UserControllerTest extends TestCase
                 'message' => 'Коллекция фото обновлена'
             ]);
 
-        $updatedUser = $this->user->fresh();
+        $updatedUser = $this->user->fresh()->toDTO();
 
         $this->assertNotEquals($oldPhotos, $updatedUser->photos);
 
