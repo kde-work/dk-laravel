@@ -36,7 +36,7 @@ class ImageProcessorService
             return $results;
         } finally {
             if (isset($image)) {
-                $image->core()->native()->destroy();
+                unset($image);
             }
         }
     }
