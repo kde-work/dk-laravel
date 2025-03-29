@@ -5,6 +5,8 @@ namespace App\Models;
 use App\DTO\UserDTO;
 use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -44,5 +46,20 @@ class User extends Authenticatable
     public function toDTO(): UserDTO
     {
         return UserDTO::fromUser($this);
+    }
+
+    public function meta(): HasMany
+    {
+        return $this->hasMany(Usermeta::class);
+    }
+
+    public function getMeta(string $key): ?string
+    {
+        return $this->meta()->where('key', $key)->value('value');
+    }
+
+    public function setMeta(string $key, string $value): void
+    {
+        $this->meta()->updateOrCreate(['key' => $key], ['value' => $value]);
     }
 }

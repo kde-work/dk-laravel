@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Usermeta;
 use App\Services\UserService;
 use App\Services\PhotoService;
 use App\DTO\UserDTO;
@@ -88,6 +89,7 @@ class UserController extends Controller
 
         try {
             $photoPath = $this->photoService->upload($request->file('photo'));
+
             $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
             return response()->json(['message' => 'Фото обновлено', 'user' => $user->toDTO()->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {

@@ -2,15 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Domain\User\ValueObjects\UserMetaKey;
 
 class Usermeta extends Model
 {
     protected $fillable = ['user_id', 'key', 'value'];
 
-    public function user(): BelongsTo
+    public function getValueAttribute($value): mixed
     {
-        return $this->belongsTo(User::class);
+        return json_decode($value, true) ?? $value;
+    }
+
+    public function setValueAttribute($value): void
+    {
+        $this->attributes['value'] = is_array($value)
+            ? json_encode($value)
+            : $value;
+    }
+
+    public function scopeForKey(Builder $query, UserMetaKey $key): void
+    {
+        $query->where('key', $key->value);
     }
 }
