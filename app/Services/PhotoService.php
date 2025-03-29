@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\ProcessUploadedImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -9,10 +10,10 @@ use Illuminate\Support\Str;
 class PhotoService
 {
     /**
-     * Загружает одну или несколько фотографий.
+     * Загружает одну или несколько фотографий и ставит их обработку в очередь.
      *
      * @param UploadedFile|UploadedFile[] $files
-     * @return string|array Путь или массив путей к сохраненным файлам
+     * @return string|array Путь или массив путей к сохраненным оригинальным файлам
      */
     public function upload(array|UploadedFile $files): array|string
     {
@@ -23,10 +24,10 @@ class PhotoService
     }
 
     /**
-     * Загружает одну фотографию.
+     * Загружает одну фотографию и ставит её обработку в очередь.
      *
      * @param UploadedFile $file
-     * @return string Путь к сохраненному файлу
+     * @return string Путь к оригинальному сохраненному файлу
      */
     private function uploadSingle(UploadedFile $file): string
     {
@@ -36,14 +37,16 @@ class PhotoService
             $this->generateFilename($file)
         );
 
+        ProcessUploadedImage::dispatch($path);
+
         return Storage::url($path);
     }
 
     /**
-     * Загружает несколько фотографий.
+     * Загружает несколько фотографий и ставит их обработку в очередь.
      *
      * @param UploadedFile[] $files
-     * @return array Массив путей к сохраненным файлам
+     * @return array Массив путей к оригинальным сохраненным файлам
      */
     private function uploadMultiple(array $files): array
     {
