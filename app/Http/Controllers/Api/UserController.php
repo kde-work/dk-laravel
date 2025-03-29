@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\User\ValueObjects\UserMetaKey;
+use App\DTO\UserMetaDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Usermeta;
+use App\Services\UserMetaService;
 use App\Services\UserService;
 use App\Services\PhotoService;
 use App\DTO\UserDTO;
@@ -18,7 +20,8 @@ class UserController extends Controller
 {
     public function __construct(
         private readonly UserService  $userService,
-        private readonly PhotoService $photoService
+        private readonly PhotoService $photoService,
+        private UserMetaService       $metaService
     )
     {
     }
@@ -90,8 +93,12 @@ class UserController extends Controller
         try {
             $photoPath = $this->photoService->upload($request->file('photo'));
 
-            $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
-            return response()->json(['message' => 'Фото обновлено', 'user' => $user->toDTO()->toOpenApiModel()]);
+//            $user = $this->userService->updateProfilePhoto(Auth::user(), $photoPath);
+            $this->metaService->setMeta(
+                new UserMetaDTO(Auth::user()->id, UserMetaKey::AVATAR, $photoPath)
+            );
+
+            return response()->json(['message' => 'Фото обновлено', 'user' => Auth::user()->toDTO()->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить фото. ' . $e->getMessage()], 500);
         }
@@ -106,8 +113,13 @@ class UserController extends Controller
 
         try {
             $photosPaths = $this->photoService->upload($request->file('photos'));
-            $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
-            return response()->json(['message' => 'Коллекция фото обновлена', 'user' => $user->toDTO()->toOpenApiModel()]);
+
+//            $user = $this->userService->updatePhotos(Auth::user(), $photosPaths);
+            $this->metaService->setMeta(
+                new UserMetaDTO(Auth::user()->id, UserMetaKey::GALLERY, $photosPaths)
+            );
+
+            return response()->json(['message' => 'Коллекция фото обновлена', 'user' => Auth::user()->toDTO()->toOpenApiModel()]);
         } catch (Exception|Throwable $e) {
             return response()->json(['error' => 'Не удалось обновить коллекцию фото. ' . $e->getMessage()], 500);
         }

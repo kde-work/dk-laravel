@@ -8,6 +8,8 @@ use App\Domain\User\ValueObjects\UserMetaKey;
 
 class Usermeta extends Model
 {
+    protected $table = 'usermeta';
+
     protected $fillable = ['user_id', 'key', 'value'];
 
     public function getValueAttribute($value): mixed

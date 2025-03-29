@@ -37,7 +37,7 @@ class PhotoService
             $this->generateFilename($file)
         );
 
-        ProcessUploadedImage::dispatch($path);
+//        ProcessUploadedImage::dispatch($path);
 
         return Storage::url($path);
     }
