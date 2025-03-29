@@ -39,7 +39,7 @@ class UserDTO
             height: $user->height,
             children: $user->children,
             photo: $meta->firstWhere('key', 'avatar')?->value,
-            photos: $meta->where('key', 'gallery')->pluck('value')->toArray(),
+            photos: $meta->where('key', 'gallery')->pluck('value')->first() ?? [],
             birthdate: $user->birthdate,
             chatId: $user->chatId,
             hasChat: $user->hasChat
