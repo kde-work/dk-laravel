@@ -8,12 +8,12 @@ class ImageUpload extends Model
 {
     protected $fillable = [
         'path',
-        'formats',
-        'processed'
+        'processed_paths',
+        'processed',
     ];
 
     protected $casts = [
-        'formats' => 'array',
-        'processed' => 'boolean'
+        'processed_paths' => 'array',
+        'processed' => 'boolean',
     ];
 }
