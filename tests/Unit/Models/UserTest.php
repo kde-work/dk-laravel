@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use App\DTO\UserDTO;
 use App\Models\User;
+use App\Models\Usermeta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,19 +18,29 @@ class UserTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'secret',
-            'age' => 25,
-            'height' => 180.5,
-            'children' => true,
-            'photo' => 'avatar.jpg',
-            'photos' => ['img1.jpg', 'img2.jpg'],
-            'birthdate' => '2000-01-01',
-            'chatId' => '12345',
-            'hasChat' => true,
-        ]);
+        // Создаем пользователя
+        $this->user = User::factory()
+            ->has(
+                Usermeta::factory()
+                    ->state(['key' => 'avatar', 'value' => 'avatar.jpg']),
+                'meta'
+            )
+            ->has(
+                Usermeta::factory()
+                    ->state(['key' => 'gallery', 'value' => ['img1.jpg', 'img2.jpg']]),
+                'meta'
+            )
+            ->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => bcrypt('secret'),
+                'age' => 25,
+                'height' => 180.5,
+                'children' => true,
+                'birthdate' => '2000-01-01',
+                'chatId' => '12345',
+                'hasChat' => true,
+            ]);
     }
 
     public function testFillableAttributesAreCorrect(): void
@@ -74,6 +85,8 @@ class UserTest extends TestCase
 
     public function testConvertsToDtoCorrectly(): void
     {
+        $this->user->load('meta');
+
         $dto = $this->user->toDTO();
 
         $this->assertInstanceOf(UserDTO::class, $dto);
@@ -83,16 +96,22 @@ class UserTest extends TestCase
         $this->assertTrue($dto->children);
         $this->assertEquals('avatar.jpg', $dto->photo);
         $this->assertEquals(['img1.jpg', 'img2.jpg'], $dto->photos);
-        $this->assertEquals('2000-01-01', $dto->birthdate->format('Y-m-d'));
+        $this->assertEquals('2000-01-01', $dto->birthdate?->format('Y-m-d'));
         $this->assertEquals('12345', $dto->chatId);
         $this->assertTrue($dto->hasChat);
     }
 
-    public function _testHandlesNullPhotosInDto(): void
+    public function testHandlesNullPhotosInDto(): void
     {
-        $user = User::factory()->create(['photos' => null]);
+        // Создаем пользователя без метаданных для галереи
+        $user = User::factory()->create();
+
+        // Загружаем метаданные (в данном случае их нет)
+        $user->load('meta');
+
         $dto = $user->toDTO();
 
+        // Проверяем, что photos является пустым массивом
         $this->assertIsArray($dto->photos);
         $this->assertEmpty($dto->photos);
     }
