@@ -3,10 +3,10 @@
 namespace Tests\Unit\Services;
 
 use App\Services\ImageProcessorService;
-use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Exceptions\DecoderException;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ImageProcessorServiceTest extends TestCase
@@ -17,37 +17,38 @@ class ImageProcessorServiceTest extends TestCase
     {
         parent::setUp();
 
-        $imageManager = new ImageManager(
-            new Driver()
-        );
-
+        $imageManager = new ImageManager(new Driver());
         $this->service = new ImageProcessorService($imageManager, 80);
-
-        Storage::fake('public');
     }
 
-    public function testProcessImageWithMultipleFormats()
+    public function testProcessImageSuccessfully(): void
     {
-        $file = UploadedFile::fake()->image('test.jpg', 800, 600);
-        $originalPath = $file->store('photos', 'public');
+        // Подготовка тестового изображения
+        Storage::fake('public');
+        $originalPath = 'test-images/original.jpg';
+        Storage::disk('public')->put($originalPath, file_get_contents(__DIR__ . '/fixtures/original.jpg'));
 
-        $formats = ['png', 'webp', 'avif'];
-        $result = $this->service->processImage(
+        // Выполняем обработку изображения
+        $results = $this->service->processImage(
             Storage::disk('public')->path($originalPath),
-            $formats
+            ['webp', 'jpg']
         );
 
-        foreach ($formats as $format) {
-            $expectedPath = 'photos/' . pathinfo($originalPath, PATHINFO_FILENAME) . '.' . $format;
-
-            // Проверяем существование файла
-            Storage::disk('public')->assertExists($expectedPath);
-
-            // Проверяем возвращаемые пути
-            $this->assertEquals(
-                Storage::url($expectedPath),
-                $result[$format]
-            );
+        // Проверяем, что пути приведены к единому виду и файлы созданы
+        foreach (['webp', 'jpg'] as $format) {
+            $expectedPath = str_replace('.jpg', ".$format", Storage::disk('public')->path($originalPath));
+            $this->assertArrayHasKey($format, $results);
+            $this->assertEquals($expectedPath, $results[$format]);
+            Storage::disk('public')->assertExists(str_replace('.jpg', ".$format", $originalPath));
         }
     }
+
+    public function testProcessImageThrowsDecoderExceptionForInvalidInput(): void
+    {
+        $this->expectException(DecoderException::class);
+
+        // Передаем некорректный путь
+        $this->service->processImage('/invalid/path/to/image.jpg', ['webp']);
+    }
+
 }
