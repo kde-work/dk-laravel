@@ -4,6 +4,7 @@ namespace Tests\Unit\DTO;
 
 use App\DTO\UserDTO;
 use App\Models\User;
+use App\Models\Usermeta;
 use DateTime;
 use OpenAPI\Server\Model\User as OpenApiUser;
 use Tests\TestCase;
@@ -12,17 +13,35 @@ class UserDTOTest extends TestCase
 {
     public function testFromUser(): void
     {
-        $user = User::factory()->create([
-            'name' => 'Jane Doe',
-            'age' => 25,
-            'height' => 165.0,
-            'children' => false,
-            'photo' => 'jane.jpg',
-            'photos' => ['jane1.jpg', 'jane2.jpg'],
-            'birthdate' => new DateTime('1995-05-05'),
-            'chatId' => 'chat456',
-            'hasChat' => false
-        ]);
+        $user = User::factory()
+            ->has(
+                Usermeta::factory()
+                    ->state([
+                        'key' => 'avatar',
+                        'value' => 'jane.jpg'
+                    ]),
+                'meta'
+            )
+            ->has(
+                Usermeta::factory()
+                    ->state([
+                        'key' => 'gallery',
+                        'value' => ['jane1.jpg', 'jane2.jpg']
+                    ]),
+                'meta'
+            )
+            ->create([
+                'name' => 'Jane Doe',
+                'age' => 25,
+                'height' => 165.0,
+                'children' => false,
+                'birthdate' => new DateTime('1995-05-05'),
+                'chatId' => 'chat456',
+                'hasChat' => false
+            ]);
+
+        // Явно загружаем метаданные для теста
+        $user->load('meta');
 
         $dto = UserDTO::fromUser($user);
 
@@ -37,6 +56,7 @@ class UserDTOTest extends TestCase
         $this->assertEquals('chat456', $dto->chatId);
         $this->assertFalse($dto->hasChat);
     }
+
 
     public function testFromArray(): void
     {
