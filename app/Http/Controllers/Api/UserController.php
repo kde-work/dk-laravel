@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Services\UserMetaService;
 use App\Services\UserService;
 use App\Services\PhotoService;
+use App\Repositories\UserRepositoryInterface;
 use App\DTO\UserDTO;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -19,18 +20,24 @@ use Throwable;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserService  $userService,
-        private readonly PhotoService $photoService,
-        private UserMetaService       $metaService
+        private readonly UserService             $userService,
+        private readonly PhotoService            $photoService,
+        private readonly UserMetaService         $metaService,
+        private readonly UserRepositoryInterface $userRepository
     )
     {
     }
 
     public function show(): JsonResponse
     {
-        /** @var UserDTO $userDTO */
-        $userDTO = Auth::user()->toDTO();
-        return response()->json($userDTO->toOpenApiModel());
+        $user = $this->userRepository->find(Auth::user()->toDTO()->id);
+        return response()->json($user);
+    }
+
+    public function index(): JsonResponse
+    {
+        $users = $this->userRepository->all();
+        return response()->json($users);
     }
 
     public function update(Request $request): JsonResponse
