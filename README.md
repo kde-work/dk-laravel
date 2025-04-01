@@ -8,7 +8,7 @@
 
 - **Laravel Framework**: Built with Laravel, leveraging its powerful tools for routing, Eloquent ORM, middleware, and more.
 - **PHP 8**: Fully utilizes modern PHP 8 features like attributes, enums, union types, and named arguments.
-- **Domain-Driven Design (DDD)**: Implements basic DDD concepts such as Value Objects in the `Domain` layer.
+- **Domain-Driven Design (DDD)**: Implements basic DDD concepts such as Value Objects in the `Domain` layer, Services, Ubiquitous Language, Data Transfer Objects (DTOs), Scoped Queries, Fundamentals of strategic design.
 - **Dynamic User Metadata**: Uses a flexible `usermeta` table to store user-related metadata like avatars and gallery photos.
 - **Image Processing**: Includes an `ImageProcessorService` for handling image compression and format conversion (e.g., WebP).
 - **Queue-Based Background Jobs**: Processes tasks like image optimization asynchronously using Laravel's queue system.
