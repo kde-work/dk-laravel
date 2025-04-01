@@ -1,17 +1,17 @@
 openapi: 3.1.0
 info:
-  title: Datince - REST API
+  title: DK - REST API
   description: |-
-    REST API for Datince.
+    REST API for DK.
   contact:
-    email: avbaryshev@yandex.ru
-  version: 2.0.6
+    email: kde.acc@gmail.com
+  version: 2.0.12
 servers:
-  - url: https://datinplace.ru/api/v2/
+  - url: https://dk.test/api/v2/
 tags:
   - name: user
     description: User management operations
-  - name: locations
+  - name: places
     description: Bars, restaurants, etc.
   - name: filters
     description: Age, height, children, etc.
@@ -131,7 +131,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: number
       responses:
         '200':
           description: User profile data
@@ -255,14 +255,14 @@ paths:
         '200':
           description: Photos collection updated
 
-  /locations/default:
+  /places:
     get:
-      tags: [locations]
-      summary: Get default location
+      tags: [places]
+      summary: Get user places
 
       responses:
         '200':
-          description: Default location data
+          description: User places data
           content:
             application/json:
               schema:
@@ -274,29 +274,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponsePlace'
 
-  /locations/{locationId}:
+  /places/{placeId}:
     get:
-      tags: [locations]
+      tags: [places]
       summary: Get specific location
       parameters:
-        - name: locationId
+        - name: placeId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Location data
+          description: Location data. Список пользователей отображается только для активного места (default).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Location'
 
     patch:
-      tags: [locations]
+      tags: [places]
       summary: Update location status
       parameters:
-        - name: locationId
+        - name: placeId
           in: path
           required: true
           schema:
@@ -320,10 +320,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponsePlace'
 
     delete:
-      tags: [locations]
+      tags: [places]
       summary: Delete location
       parameters:
-        - name: locationId
+        - name: placeId
           in: path
           required: true
           schema:
@@ -514,17 +514,16 @@ components:
     User:
       type: object
       properties:
+        id:
+          type: number
         name:
           type: string
         email:
           type: string
-        age:
-          type: integer
-          minimum: 0
         height:
           type: number
         children:
-          type: boolean
+          type: number
         photo:
           type: string
           format: uri
@@ -551,9 +550,9 @@ components:
         text:
           type: string
         senderId:
-          type: string
+          type: number
         receiverId:
-          type: string
+          type: number
         timestamp:
           type: string
         status:
@@ -573,6 +572,10 @@ components:
         address:
           type: string
         name:
+          type: string
+        default:
+          type: boolean
+        category:
           type: string
         coord:
           type: object
@@ -597,11 +600,11 @@ components:
             $ref: '#/components/schemas/Goal'
       examples:
         - value:
-          - id: 1
-            name: "Goal 1"
-            selected: true
-          - id: 2
-            name: "Goal 2"
+            - id: 1
+              name: "Goal 1"
+              selected: true
+            - id: 2
+              name: "Goal 2"
 
     ChatList:
       type: object
@@ -655,37 +658,6 @@ components:
             code: 400
             message: "Невозможно выбрать эту категорию заведений"
 
-    UserUpdate:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-        birthdate:
-          type: string
-          format: date
-        name:
-          type: string
-        age:
-          type: integer
-        height:
-          type: number
-        children:
-          type: array
-          items:
-            type: string
-        photo:
-          type: string
-          format: uri
-        photos:
-          type: array
-          items:
-            type: string
-            format: uri
-
     Filter:
       type: object
       properties:
@@ -706,11 +678,12 @@ components:
             $ref: '#/components/schemas/Filter'
       examples:
         - filters:
-          - id: 1
-            name: "filter 1"
-            selected: true
-          - id: 2
-            name: "filter 2"
+            - id: 1
+              name: "filter 1"
+              selected: true
+            - id: 2
+              name: "filter 2"
+        - users
 
     FiltersWithGoals:
       type: object
@@ -733,7 +706,7 @@ components:
             $ref: '#/components/schemas/Filter'
       examples:
         - filter type:
-          - id: 1
-            name: "filter value 1"
-          - id: 2
-            name: "filter value 2"
+            - id: 1
+              name: "filter value 1"
+            - id: 2
+              name: "filter value 2"
