@@ -22,9 +22,7 @@ class Usermeta extends Model
 
     public function setValueAttribute($value): void
     {
-        $this->attributes['value'] = is_array($value)
-            ? json_encode($value)
-            : $value;
+        $this->attributes['value'] = json_encode($value);
     }
 
     public function scopeForKey(Builder $query, UserMetaKey $key): void
