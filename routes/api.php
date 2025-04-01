@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ResourceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
@@ -18,4 +19,6 @@ Route::prefix('v2')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+
+    Route::get('/resources/filters', [ResourceController::class, 'getFilters']);
 });

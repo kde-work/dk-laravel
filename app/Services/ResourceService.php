@@ -7,12 +7,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ResourceService
 {
-    /**
-     * Получение ресурсов из JSON-файла и преобразование в массив DTO.
-     */
-    public function getResources(string $filePath): array
+    public function getResources(string $fileName, string $storage = 'public'): array
     {
-        $data = json_decode(Storage::get($filePath), true);
+        $data = json_decode(Storage::disk($storage)->get($fileName), true);
 
         return array_map(fn($item) => ResourceDTO::fromArray($item), $data);
     }

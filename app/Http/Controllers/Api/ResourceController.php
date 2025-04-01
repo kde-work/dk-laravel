@@ -17,7 +17,7 @@ class ResourceController extends Controller
 
     public function getFilters(): JsonResponse
     {
-        $resources = $this->resourceService->getResources('private/filters.json');
+        $resources = $this->resourceService->getResources('filters.json');
 
         return response()->json(['filters' => array_map(fn($dto) => $dto->toArray(), $resources)], 200);
     }

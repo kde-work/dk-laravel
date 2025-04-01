@@ -4,14 +4,19 @@ namespace Tests\Unit\Services;
 
 use App\Services\ResourceService;
 use App\DTO\ResourceDTO;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ResourceServiceTest extends TestCase
 {
-    /**
-     * Тест метода getResources.
-     */
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     public function testGetResources(): void
     {
         $mockJson = json_encode([
@@ -26,12 +31,23 @@ class ResourceServiceTest extends TestCase
 
         $service = new ResourceService();
 
-        $result = $service->getResources('private/filters.json');
+        $result = $service->getResources('filters.json');
 
         $this->assertCount(2, $result);
         $this->assertInstanceOf(ResourceDTO::class, $result[0]);
         $this->assertEquals(1, $result[0]->id);
         $this->assertEquals('filter value 1', $result[0]->name);
         $this->assertFalse($result[0]->selected);
+    }
+
+    public function testResourcesFiltersRoute()
+    {
+        $response = $this->getJson('/api/v2/resources/filters');
+
+        $response->assertStatus(200);
+
+        $data = $response->json();
+
+        $this->assertIsArray($data);
     }
 }
