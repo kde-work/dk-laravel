@@ -4,19 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Services\ResourceService;
 use App\DTO\ResourceDTO;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Tests\TestCase;
 
 class ResourceServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testGetResources(): void
     {
         $mockJson = json_encode([
@@ -24,10 +19,16 @@ class ResourceServiceTest extends TestCase
             ['id' => 2, 'name' => 'filter value 2', 'selected' => true],
         ]);
 
-        Storage::shouldReceive('get')
+        $mockDisk = Mockery::mock(Filesystem::class);
+        $mockDisk->shouldReceive('get')
             ->once()
-            ->with('private/filters.json')
+            ->with('filters.json')
             ->andReturn($mockJson);
+
+        Storage::shouldReceive('disk')
+            ->once()
+            ->with('public')
+            ->andReturn($mockDisk);
 
         $service = new ResourceService();
 
