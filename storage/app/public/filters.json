@@ -1,0 +1,4 @@
+[
+    { "id": 1, "name": "filter value 1", "selected": false },
+    { "id": 2, "name": "filter value 2", "selected": true }
+]
