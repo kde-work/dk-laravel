@@ -33,7 +33,7 @@ To run this project locally:
 1. Clone the repository:
 ```
 
-git clone https://github.com/yourusername/dk-laravel.git
+git clone https://github.com/kde-work/dk-laravel
 cd dk-laravel
 
 ```
