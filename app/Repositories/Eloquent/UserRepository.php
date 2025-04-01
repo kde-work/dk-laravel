@@ -17,12 +17,12 @@ readonly class UserRepository implements UserRepositoryInterface
         return $this->model->all();
     }
 
-    public function find(int $id): ?object
+    public function find(int $id): ?User
     {
         return $this->model->find($id);
     }
 
-    public function create(array $data): object
+    public function create(array $data): User
     {
         return $this->model->create($data);
     }
@@ -30,7 +30,7 @@ readonly class UserRepository implements UserRepositoryInterface
     public function update(int $id, array $data): bool
     {
         $user = $this->find($id);
-        return $user ? $user->update($data) : false;
+        return $user && $user->update($data);
     }
 
     public function delete(int $id): bool
