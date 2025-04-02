@@ -5,7 +5,6 @@ namespace Tests\Unit\Services;
 use App\Services\ResourceService;
 use App\DTO\ResourceDTO;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Tests\TestCase;
