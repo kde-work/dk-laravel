@@ -1,17 +1,4 @@
 [
-    {
-        "name": "age",
-        "type": "int",
-        "validation": "required|integer|min:18"
-    },
-    {
-        "name": "category",
-        "type": "select",
-        "validation": "required|in:electronics,books,clothing"
-    },
-    {
-        "name": "newsletter",
-        "type": "checkbox",
-        "validation": "required|boolean"
-    }
+    { "id": 1, "name": "filter value 1", "selected": false },
+    { "id": 2, "name": "filter value 2", "selected": true }
 ]
