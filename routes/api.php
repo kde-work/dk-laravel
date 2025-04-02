@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\FilterController;
 use App\Http\Controllers\Api\ResourceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
@@ -15,6 +16,8 @@ Route::prefix('v2')->group(function () {
         Route::patch('/user/password', [UserController::class, 'updatePassword']);
         Route::patch('/user/photo', [UserController::class, 'updatePhoto']);
         Route::patch('/user/photos', [UserController::class, 'updatePhotos']);
+
+        Route::get('/filters', [FilterController::class, 'index']);
     });
 
     Route::post('/auth/register', [AuthController::class, 'register']);
