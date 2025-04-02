@@ -2,6 +2,8 @@
 
 namespace App\DTO;
 
+use App\Services\FilterTypeService;
+
 readonly class FilterDTO
 {
     public function __construct(
@@ -28,5 +30,14 @@ readonly class FilterDTO
             'value' => $this->value,
             'type' => $this->type->toArray(),
         ];
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            id: $data['id'],
+            value: $data['value'],
+            type: (new FilterTypeService)->findByName($data['type'])
+        );
     }
 }
