@@ -6,11 +6,14 @@ use App\DTO\UserDTO;
 use App\Models\User;
 use App\Models\Usermeta;
 use DateTime;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use OpenAPI\Server\Model\User as OpenApiUser;
 use Tests\TestCase;
 
 class UserDTOTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testFromUser(): void
     {
         $user = User::factory()
